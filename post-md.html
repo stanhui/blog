@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章 · OpsLife</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .md-wrap { max-width: 780px; margin: 0 auto; padding: 7rem 2rem 5rem; position: relative; z-index: 1; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--text-muted); font-size: 0.88rem; margin-bottom: 2rem; transition: color 0.2s; }
+    .back-link:hover { color: var(--cyan); }
+    /* Markdown typography */
+    .md-body h1 { font-size: clamp(1.6rem,4vw,2.2rem); font-weight: 800; margin-bottom: 0.5rem; line-height: 1.25; }
+    .md-body h2 { font-size: 1.35rem; font-weight: 700; color: var(--cyan); margin: 2.5rem 0 1rem; padding-left: 0.75rem; border-left: 3px solid var(--cyan); }
+    .md-body h3 { font-size: 1.05rem; font-weight: 600; color: var(--purple); margin: 1.8rem 0 0.6rem; }
+    .md-body h4 { font-size: 0.95rem; font-weight: 600; margin: 1.2rem 0 0.4rem; }
+    .md-body p  { color: var(--text-muted); line-height: 1.85; margin-bottom: 1.1rem; }
+    .md-body ul, .md-body ol { padding-left: 1.5rem; margin-bottom: 1.1rem; }
+    .md-body li { color: var(--text-muted); line-height: 1.8; margin-bottom: 0.3rem; }
+    .md-body strong { color: var(--text); }
+    .md-body a  { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }
+    .md-body hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    .md-body blockquote {
+      border-left: 3px solid var(--purple); padding: 0.8rem 1.25rem; margin: 1.5rem 0;
+      background: color-mix(in srgb, var(--purple) 6%, transparent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    .md-body blockquote p { margin: 0; font-style: italic; }
+    .md-body pre {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem 1.5rem;
+      overflow-x: auto; margin: 1.2rem 0 1.5rem;
+    }
+    .md-body pre code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem; line-height: 1.7; color: var(--text);
+      background: none; border: none; padding: 0;
+    }
+    .md-body code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+      background: color-mix(in srgb, var(--cyan) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--cyan) 20%, transparent);
+      padding: 0.1em 0.45em; border-radius: 4px; color: var(--cyan);
+    }
+    .md-body table { width: 100%; border-collapse: collapse; margin: 1.2rem 0 1.5rem; font-size: 0.9rem; }
+    .md-body th { background: var(--surface2); color: var(--cyan); padding: 0.5rem 0.75rem; text-align: left; border: 1px solid var(--border); }
+    .md-body td { padding: 0.45rem 0.75rem; border: 1px solid var(--border); color: var(--text-muted); }
+    .md-body tr:nth-child(even) td { background: color-mix(in srgb, var(--surface) 50%, transparent); }
+    .md-body img { max-width: 100%; border-radius: var(--radius); margin: 1rem 0; }
+    /* Post meta (from frontmatter) */
+    .post-fm-meta { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.82rem; color: var(--text-muted); margin: 0.75rem 0 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    .post-fm-tag { padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; background: color-mix(in srgb, var(--cyan) 10%, transparent); border: 1px solid color-mix(in srgb, var(--cyan) 20%, transparent); color: var(--cyan); }
+    #loading { color: var(--text-muted); padding: 4rem 0; text-align: center; }
+  </style>
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">Ops<span>Life</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="archive.html">归档</a></li>
+    <li><a href="about.html">关于我</a></li>
+    <li><a href="https://github.com/stanhui/blog" target="_blank">GitHub</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:0.75rem">
+    <button class="theme-toggle" aria-label="切换主题"></button>
+    <button class="menu-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="md-wrap">
+  <a href="index.html" class="back-link">← 返回首页</a>
+  <div id="loading">加载中…</div>
+  <div class="md-body" id="md-body" style="display:none"></div>
+</div>
+
+<footer>
+  <p>© 2026 OpsLife · <a href="index.html">← 返回首页</a></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script src="js/posts.js"></script>
+<script src="js/main.js"></script>
+<script>
+// Parse simple YAML-like frontmatter: --- key: value ---
+function parseFrontmatter(text) {
+  const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (!match) return { meta: {}, content: text };
+  const meta = {};
+  match[1].split('\n').forEach(line => {
+    const [k, ...v] = line.split(':');
+    if (k) meta[k.trim()] = v.join(':').trim().replace(/^["']|["']$/g, '');
+  });
+  return { meta, content: match[2] };
+}
+
+async function loadMarkdown() {
+  const src = new URLSearchParams(location.search).get('src');
+  if (!src) { document.getElementById('loading').textContent = '未指定文章路径'; return; }
+
+  const res = await fetch(src);
+  if (!res.ok) { document.getElementById('loading').textContent = '文章加载失败'; return; }
+
+  const raw = await res.text();
+  const { meta, content } = parseFrontmatter(raw);
+
+  // Update page title
+  if (meta.title) document.title = meta.title + ' · OpsLife';
+
+  // Render meta bar
+  const metaHtml = `
+    ${meta.date ? `<span>📅 ${meta.date}</span>` : ''}
+    ${meta.readTime ? `<span>⏱ ${meta.readTime} min read</span>` : ''}
+    ${meta.category ? `<span class="post-fm-tag">${meta.category}</span>` : ''}
+    ${meta.tags ? meta.tags.split(',').map(t => `<span class="post-fm-tag">${t.trim()}</span>`).join('') : ''}
+  `;
+
+  const body = document.getElementById('md-body');
+  body.innerHTML = marked.parse(content);
+
+  // Insert meta after h1
+  const h1 = body.querySelector('h1');
+  if (h1 && metaHtml.trim()) {
+    const div = document.createElement('div');
+    div.className = 'post-fm-meta';
+    div.innerHTML = metaHtml;
+    h1.after(div);
+  }
+
+  document.getElementById('loading').style.display = 'none';
+  body.style.display = 'block';
+}
+
+loadMarkdown();
+</script>
+</body>
+</html>
