@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关于我 · OpsLife</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">Ops<span>Life</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="about.html" class="active">关于我</a></li>
+    <li><a href="https://github.com" target="_blank">GitHub</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:0.75rem">
+    <button class="theme-toggle" aria-label="切换主题"></button>
+    <button class="menu-toggle" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- About Hero -->
+<div class="about-hero">
+  <div class="avatar-wrap">
+    <div class="avatar-placeholder">🧑‍💻</div>
+  </div>
+  <h1 class="about-name">运维老兵</h1>
+  <p class="about-title">Senior DevOps / SRE Engineer · 15年从业经验</p>
+  <p class="about-bio">热爱技术，专注于云原生、自动化运维和系统稳定性。相信好的基础设施是业务成功的基石。</p>
+  <div class="hero-btns">
+    <a href="index.html" class="btn btn-primary">查看文章</a>
+    <a href="mailto:hello@opslife.dev" class="btn btn-outline">联系我</a>
+  </div>
+</div>
+
+<!-- Skills -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">// 技术栈</div>
+      <h2 class="section-title">核心技能</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card reveal">
+        <h4>🐧 系统 & 网络</h4>
+        <div class="skill-item">
+          <span><span>Linux (RHEL/Ubuntu)</span><span>98%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.98"></div></div>
+        </div>
+        <div class="skill-item">
+          <span><span>TCP/IP & 网络调优</span><span>90%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.90"></div></div>
+        </div>
+        <div class="skill-item">
+          <span><span>Shell / Python 脚本</span><span>92%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.92"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal" style="--delay:0.1s">
+        <h4>☸️ 容器 & 编排</h4>
+        <div class="skill-item">
+          <span><span>Kubernetes</span><span>95%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.95"></div></div>
+        </div>
+        <div class="skill-item">
+          <span><span>Docker / Containerd</span><span>96%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.96"></div></div>
+        </div>
+        <div class="skill-item">
+          <span><span>Helm / Kustomize</span><span>85%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.85"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal" style="--delay:0.2s">
+        <h4>📊 监控 & 可观测性</h4>
+        <div class="skill-item">
+          <span><span>Prometheus / Grafana</span><span>93%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.93"></div></div>
+        </div>
+        <div class="skill-item">
+          <span><span>ELK Stack</span><span>88%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.88"></div></div>
+        </div>
+        <div class="skill-item">
+          <span><span>Jaeger / OpenTelemetry</span><span>75%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.75"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal" style="--delay:0.3s">
+        <h4>☁️ 云 & IaC</h4>
+        <div class="skill-item">
+          <span><span>AWS / 阿里云</span><span>87%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.87"></div></div>
+        </div>
+        <div class="skill-item">
+          <span><span>Terraform / Ansible</span><span>90%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.90"></div></div>
+        </div>
+        <div class="skill-item">
+          <span><span>GitLab CI / Jenkins</span><span>88%</span></span>
+          <div class="skill-bar"><div class="skill-fill" style="--w:0.88"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section class="section">
+  <div class="container" style="max-width:700px">
+    <div class="section-header reveal">
+      <div class="section-tag">// 职业历程</div>
+      <h2 class="section-title">从机房到云端</h2>
+    </div>
+    <div class="timeline reveal">
+      <div class="timeline-item">
+        <div class="timeline-year">2010 — 2013</div>
+        <h4>系统运维工程师</h4>
+        <p>从机房值班开始，负责数百台物理服务器的日常运维，打下扎实的 Linux 基础。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2013 — 2017</div>
+        <h4>高级运维工程师</h4>
+        <p>主导公司虚拟化改造，引入 OpenStack，实现资源池化管理，运维效率提升 60%。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2017 — 2021</div>
+        <h4>DevOps 工程师</h4>
+        <p>推动容器化转型，搭建 Kubernetes 集群，建立 CI/CD 流水线，实现日均百次发布。</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2021 — 至今</div>
+        <h4>SRE / 架构师</h4>
+        <p>负责多云架构设计，建立 SLO/SLA 体系，推动可观测性平台建设，保障系统 99.99% 可用性。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 OpsLife · 用代码丈量世界 · Built with ❤️ &amp; ☕</p>
+</footer>
+
+<script src="js/posts.js"></script>
+<script src="js/main.js"></script>
+<script>
+// Animate skill bars on scroll
+document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        e.target.querySelectorAll('.skill-fill').forEach(bar => {
+          bar.style.width = (parseFloat(bar.style.getPropertyValue('--w')) * 100) + '%';
+        });
+      }
+    });
+  }, { threshold: 0.2 });
+  document.querySelectorAll('.skill-card').forEach(c => observer.observe(c));
+});
+</script>
+</body>
+</html>

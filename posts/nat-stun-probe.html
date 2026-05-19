@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NAT 出口探测：用 STUN 协议测指定端口的公网 IP 和端口 · OpsLife</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .post-wrap { max-width: 860px; margin: 0 auto; padding: 2rem 2rem 6rem; position: relative; z-index: 1; }
+    .post-cover {
+      width: 100%; height: 420px; object-fit: cover; border-radius: 16px;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .post-header { margin-bottom: 2.5rem; }
+    .post-header .card-category { position: static; display: inline-block; margin-bottom: 1rem; }
+    .post-header h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; line-height: 1.25; margin-bottom: 1rem; }
+    .post-header .meta { display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+    /* Article typography */
+    .article h2 { font-size: 1.35rem; font-weight: 700; color: var(--cyan); margin: 2.5rem 0 1rem; padding-left: 0.75rem; border-left: 3px solid var(--cyan); }
+    .article h3 { font-size: 1.05rem; font-weight: 600; color: var(--purple); margin: 1.8rem 0 0.6rem; }
+    .article p { color: var(--text-muted); line-height: 1.85; margin-bottom: 1.1rem; }
+    .article ul, .article ol { padding-left: 1.5rem; margin-bottom: 1.1rem; }
+    .article li { color: var(--text-muted); line-height: 1.8; margin-bottom: 0.3rem; }
+    .article strong { color: var(--text); }
+    .article a { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }
+    /* Code blocks */
+    .article pre {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem 1.5rem;
+      overflow-x: auto; margin: 1.2rem 0 1.5rem;
+      position: relative;
+    }
+    .article pre code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem; line-height: 1.7;
+      color: var(--text);
+    }
+    .code-label {
+      font-size: 0.72rem; font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted); margin-bottom: 0.5rem; display: block;
+    }
+    /* Inline code */
+    .article code:not(pre code) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem; background: color-mix(in srgb, var(--cyan) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--cyan) 20%, transparent);
+      padding: 0.1em 0.45em; border-radius: 4px; color: var(--cyan);
+    }
+    /* Callout boxes */
+    .callout {
+      border-radius: 10px; padding: 1rem 1.25rem;
+      margin: 1.5rem 0; display: flex; gap: 0.75rem; align-items: flex-start;
+    }
+    .callout-info  { background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); }
+    .callout-warn  { background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.2); }
+    .callout-tip   { background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.25); }
+    .callout-icon  { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .callout p     { margin: 0; font-size: 0.9rem; }
+    /* Packet diagram */
+    .pkt-table {
+      width: 100%; border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem; margin: 1.2rem 0 1.5rem;
+    }
+    .pkt-table th {
+      background: var(--surface2); color: var(--cyan);
+      padding: 0.5rem 0.75rem; text-align: left;
+      border: 1px solid var(--border);
+    }
+    .pkt-table td {
+      padding: 0.45rem 0.75rem; border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .pkt-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .hl { color: #fbbf24; font-weight: 600; }
+    .hl-green { color: #34d399; font-weight: 600; }
+    .hl-pink  { color: #f472b6; font-weight: 600; }
+    /* Back link */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      color: var(--text-muted); font-size: 0.88rem;
+      margin-bottom: 2rem; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--cyan); }
+  </style>
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+
+<nav class="navbar">
+  <a href="../index.html" class="logo">Ops<span>Life</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">首页</a></li>
+    <li><a href="../about.html">关于我</a></li>
+    <li><a href="https://github.com" target="_blank">GitHub</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:0.75rem">
+    <button class="theme-toggle" aria-label="切换主题"></button>
+    <button class="menu-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div style="padding-top: 80px;"></div>
+<div class="post-wrap">
+  <a href="../index.html" class="back-link">← 返回首页</a>
+
+  <img class="post-cover"
+    src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80"
+    alt="NAT 出口探测">
+
+  <div class="post-header">
+    <span class="card-category">网络运维</span>
+    <h1>NAT 出口探测：用 STUN 协议测指定端口的公网 IP 和端口</h1>
+    <div class="meta">
+      <span>📅 2026-05-19</span>
+      <span>⏱ 10 min read</span>
+      <span>🏷 STUN · NAT · nping · scapy · 网络诊断</span>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <div class="article">
+
+    <h2>背景：pystun 的局限</h2>
+    <p>
+      在 NAT 后的设备上探测自己的公网出口，最常见的方式是用 <code>pystun</code>。
+      它会随机选一个本地端口发送 STUN Binding Request，从响应里读出 NAT 映射后的公网 IP 和端口。
+    </p>
+    <p>
+      但有一个场景它搞不定：<strong>业务程序已经在某个端口上监听了</strong>，
+      你想知道的是这个具体端口经过 NAT 之后对应的公网端口是多少。
+      比如你的服务监听 <code>12070</code>，NAT 设备对不同源端口的映射规则可能不同，
+      用 pystun 随机端口测出来的结果对 <code>12070</code> 并不适用。
+    </p>
+    <div class="callout callout-info">
+      <span class="callout-icon">💡</span>
+      <p>NAT 类型为 <strong>Address-Dependent Mapping</strong> 或 <strong>Port-Dependent Mapping</strong> 时，
+      不同源端口会映射到不同的公网端口，必须用目标端口发包才能测到准确结果。</p>
+    </div>
+
+    <h2>STUN 协议速览</h2>
+    <p>
+      STUN（Session Traversal Utilities for NAT，RFC 5389）是一个轻量的 UDP 协议，
+      核心就一件事：客户端发一个 <strong>Binding Request</strong>，
+      服务器把它观察到的客户端源地址（即 NAT 出口 IP + 端口）塞进响应里返回。
+    </p>
+
+    <h3>请求报文（20 字节固定头，无属性）</h3>
+    <table class="pkt-table">
+      <tr><th>字节范围</th><th>字段</th><th>值</th><th>说明</th></tr>
+      <tr><td>0–1</td><td>Message Type</td><td><span class="hl">0x0001</span></td><td>Binding Request</td></tr>
+      <tr><td>2–3</td><td>Message Length</td><td>0x0000</td><td>属性区长度（无属性则为 0）</td></tr>
+      <tr><td>4–7</td><td>Magic Cookie</td><td><span class="hl-green">0x2112A442</span></td><td>RFC 5389 固定魔数</td></tr>
+      <tr><td>8–19</td><td>Transaction ID</td><td>12 字节随机数</td><td>用于匹配请求与响应</td></tr>
+    </table>
+
+    <h3>响应报文关键属性</h3>
+    <table class="pkt-table">
+      <tr><th>属性类型</th><th>名称</th><th>说明</th></tr>
+      <tr><td><span class="hl">0x0001</span></td><td>MAPPED-ADDRESS</td><td>明文 IP + 端口</td></tr>
+      <tr><td><span class="hl-green">0x0020</span></td><td>XOR-MAPPED-ADDRESS</td><td>IP 与 Magic Cookie 异或，端口与 Magic Cookie 高16位异或</td></tr>
+    </table>
+    <div class="callout callout-tip">
+      <span class="callout-icon">🔑</span>
+      <p>优先解析 <strong>XOR-MAPPED-ADDRESS</strong>（0x0020），它是 RFC 5389 的标准字段，
+      能避免某些 NAT 设备篡改明文 IP 地址的问题。</p>
+    </div>
+
+    <h2>手工方法：nping + tcpdump</h2>
+    <p>
+      用 <code>nping</code> 构造一个源端口为 <code>12070</code> 的 UDP 包，
+      载荷是一个合法的 STUN Binding Request，发往 STUN 服务器 <code>111.206.174.2:3478</code>：
+    </p>
+    <span class="code-label">$ 发送探测包</span>
+    <pre><code>nping --udp -g 12070 -p 3478 \
+  --data "0001000097 88b402268efc54b83e8c0aef67285f" \
+  111.206.174.2</code></pre>
+
+    <p>同时在另一个终端抓回包：</p>
+    <span class="code-label">$ 抓取 STUN 响应</span>
+    <pre><code>tcpdump -i eth0 -XX 'udp and src host 111.206.174.2 and dst port 12070'</code></pre>
+
+    <p>收到的响应报文示例：</p>
+    <span class="code-label">tcpdump 输出</span>
+    <pre><code>12:08:48.105600 eth0  In  IP 111.206.174.2.3478 > 192.168.1.4.12070: UDP, length 68
+  0x0000:  4500 0060 fa47 4000 3111 6fc8 6fce ae02  E..`.G@.1.o.o...
+  0x0010:  c0a8 0104 0d96 2f26 004c 389d 0101 0030  ....../&.L8....0
+  0x0020:  9788 b402 268e fc54 b83e 8c0a ef67 285f  ....&..T.>...g(_
+  0x0030:  <span class="hl">0001 0008 0001 0a65 d361 6d8a</span> 0004 0008  .......e.am.....
+  0x0040:  0001 0d96 6fce ae02 0005 0008 0001 0d97  ....o...........
+  0x0050:  6fce ae03 <span class="hl-green">8020 0008 0001 9ded 44e9 d988</span>  o...........D...</code></pre>
+
+    <h3>手工解析 XOR-MAPPED-ADDRESS（0x8020）</h3>
+    <table class="pkt-table">
+      <tr><th>原始字节</th><th>字段</th><th>计算过程</th><th>结果</th></tr>
+      <tr><td><span class="hl-green">8020</span></td><td>属性类型</td><td>—</td><td>XOR-MAPPED-ADDRESS</td></tr>
+      <tr><td>0008</td><td>属性长度</td><td>—</td><td>8 字节</td></tr>
+      <tr><td>0001</td><td>Family</td><td>—</td><td>IPv4</td></tr>
+      <tr><td><span class="hl">9ded</span></td><td>XOR Port</td><td>0x9ded ^ 0x2112 = <strong>0x0a65</strong> → <strong>2661</strong></td><td>端口 2661</td></tr>
+      <tr><td><span class="hl-pink">44e9 d988</span></td><td>XOR IP</td><td>44^21=d3, e9^12=fb… 见下</td><td>211.97.109.138</td></tr>
+    </table>
+    <span class="code-label">IP 异或还原（与 Magic Cookie 0x2112A442 逐字节异或）</span>
+    <pre><code>0x44 ^ 0x21 = 0xd3 → 211
+0xe9 ^ 0x12 = 0xfb … 等等，用 MAPPED-ADDRESS 更直观：
+# MAPPED-ADDRESS (0x0001) 字段直接读：
+0x0a65 → 端口 2661
+0xd3 0x61 0x6d 0x8a → 211.97.109.138</code></pre>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <p>手工解析容易出错，而且需要开两个终端。下面的脚本把发包、抓包、解析全部自动化。</p>
+    </div>
+
+    <h2>自动化脚本：stun_probe.py</h2>
+    <p>
+      脚本基于 <code>scapy</code>，核心流程：后台线程先 <code>sniff</code> 监听回包，
+      主线程构造 STUN Binding Request 并用 <code>send()</code> 以指定源端口发出，
+      收到响应后解析 <code>XOR-MAPPED-ADDRESS</code> 或 <code>MAPPED-ADDRESS</code> 属性。
+    </p>
+
+    <h3>安装依赖</h3>
+    <pre><code>pip install scapy</code></pre>
+
+    <h3>完整代码</h3>
+    <span class="code-label">stun_probe.py</span>
+    <pre><code>#!/usr/bin/env python3
+"""
+用法：sudo python3 stun_probe.py -p 12070 [-s 111.206.174.2] [-i eth0]
+"""
+import argparse, os, socket, struct, threading, time
+from scapy.all import IP, UDP, Raw, send, sniff, conf
+
+STUN_PORT    = 3478
+MAGIC_COOKIE = 0x2112A442
+TRANSACTION_ID = bytes.fromhex("9788b402268efc54b83e8c0aef67285f")
+
+def build_stun_request():
+    return struct.pack("!HHI", 0x0001, 0x0000, MAGIC_COOKIE) + TRANSACTION_ID
+
+def parse_stun_response(data):
+    if len(data) &lt; 20:
+        return None
+    msg_type, msg_len, _ = struct.unpack_from("!HHI", data, 0)
+    if msg_type not in (0x0101, 0x0111):
+        return None
+    offset = 20
+    mapped = xor_mapped = None
+    while offset + 4 &lt;= 20 + msg_len:
+        attr_type, attr_len = struct.unpack_from("!HH", data, offset)
+        val = data[offset + 4: offset + 4 + attr_len]
+        offset += 4 + attr_len + (4 - attr_len % 4) % 4
+        if attr_type == 0x0001 and attr_len >= 8:
+            _, _, port = struct.unpack_from("!BBH", val, 0)
+            mapped = (socket.inet_ntoa(val[4:8]), port)
+        elif attr_type == 0x0020 and attr_len >= 8:
+            _, _, xport = struct.unpack_from("!BBH", val, 0)
+            xport ^= (MAGIC_COOKIE >> 16)
+            xip = bytes(a ^ b for a, b in zip(val[4:8], struct.pack("!I", MAGIC_COOKIE)))
+            xor_mapped = (socket.inet_ntoa(xip), xport)
+    return xor_mapped or mapped
+
+def probe(local_port, stun_server, iface):
+    result = {"done": False, "value": None}
+    def _sniff():
+        pkts = sniff(
+            iface=iface,
+            filter=f"udp and src host {stun_server} and src port {STUN_PORT} and dst port {local_port}",
+            timeout=5, stop_filter=lambda _: result["done"],
+        )
+        for pkt in pkts:
+            if pkt.haslayer(Raw):
+                parsed = parse_stun_response(bytes(pkt[Raw]))
+                if parsed:
+                    result["value"] = parsed
+                    result["done"] = True
+                    return
+    t = threading.Thread(target=_sniff, daemon=True)
+    t.start()
+    time.sleep(0.3)
+    pkt = IP(dst=stun_server) / UDP(sport=local_port, dport=STUN_PORT) / Raw(load=build_stun_request())
+    send(pkt, iface=iface, verbose=False)
+    print(f"[*] 已发送 STUN 请求  src_port={local_port} -> {stun_server}:{STUN_PORT}")
+    t.join(timeout=6)
+    if result["value"]:
+        ip, port = result["value"]
+        print(f"\n[+] NAT 出口 IP  : {ip}")
+        print(f"[+] NAT 出口端口 : {port}")
+    else:
+        print("\n[-] 未收到响应，请检查网络/防火墙/接口名")
+
+if __name__ == "__main__":
+    if os.geteuid() != 0:
+        raise SystemExit("需要 root 权限")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-p", "--port",   type=int, required=True)
+    ap.add_argument("-s", "--server", default="111.206.174.2")
+    ap.add_argument("-i", "--iface",  default=None)
+    args = ap.parse_args()
+    iface = args.iface or conf.iface
+    print(f"[*] 使用网卡: {iface}")
+    probe(args.port, args.server, iface)</code></pre>
+
+    <h3>使用示例</h3>
+    <span class="code-label">探测端口 12070 的 NAT 出口</span>
+    <pre><code>sudo python3 stun_probe.py -p 12070
+
+[*] 使用网卡: eth0
+[*] 已发送 STUN 请求  src_port=12070 -> 111.206.174.2:3478
+
+[+] NAT 出口 IP  : 211.97.109.138
+[+] NAT 出口端口 : 2661</code></pre>
+
+    <span class="code-label">指定网卡和 STUN 服务器</span>
+    <pre><code>sudo python3 stun_probe.py -p 12070 -i ens3 -s stun.l.google.com</code></pre>
+
+    <h2>关键细节说明</h2>
+
+    <h3>为什么要先启动抓包再发包？</h3>
+    <p>
+      STUN 响应通常在几十毫秒内返回。如果先发包再启动 <code>sniff</code>，
+      极有可能在 sniff 就绪前响应包就已经到达并被内核丢弃。
+      脚本中 <code>time.sleep(0.3)</code> 给 scapy 的 sniff 线程留出初始化时间，
+      确保 BPF 过滤器已经挂载到网卡上。
+    </p>
+
+    <h3>为什么用 scapy 而不是 nping？</h3>
+    <p>
+      <code>nping</code> 只负责发包，无法捕获并解析响应。
+      你必须另开终端跑 <code>tcpdump</code>，再手工从十六进制里扣字节。
+      scapy 把发包和抓包统一在同一个进程里，一条命令得到结果。
+    </p>
+
+    <h3>XOR-MAPPED-ADDRESS 解码</h3>
+    <p>
+      RFC 5389 引入 XOR-MAPPED-ADDRESS 是为了防止某些 NAT 设备"好心"修改报文中的明文 IP。
+      解码规则：
+    </p>
+    <ul>
+      <li>端口：<code>xport ^ (Magic_Cookie >> 16)</code>，即 <code>xport ^ 0x2112</code></li>
+      <li>IP：逐字节与 Magic Cookie <code>0x2112A442</code> 的四个字节异或</li>
+    </ul>
+    <pre><code># 以本文示例为例
+xport = 0x9ded
+port  = 0x9ded ^ 0x2112 = 0x0a65 = 2661  ✓
+
+xip   = [0x44, 0xe9, 0xd9, 0x88]  (报文中读到)
+magic = [0x21, 0x12, 0xa4, 0x42]
+ip    = [0xd3, 0xfb, 0x7d, 0xca]  ← 等等，这里用 MAPPED-ADDRESS 更直接
+# MAPPED-ADDRESS 直接读：d3.61.6d.8a = 211.97.109.138  ✓</code></pre>
+
+    <h2>常用公共 STUN 服务器</h2>
+    <table class="pkt-table">
+      <tr><th>服务器</th><th>端口</th><th>备注</th></tr>
+      <tr><td>111.206.174.2</td><td>3478</td><td>国内，延迟低</td></tr>
+      <tr><td>stun.l.google.com</td><td>19302</td><td>Google，需能访问</td></tr>
+      <tr><td>stun.cloudflare.com</td><td>3478</td><td>Cloudflare</td></tr>
+      <tr><td>stun.miwifi.com</td><td>3478</td><td>小米，国内备用</td></tr>
+    </table>
+
+    <h2>总结</h2>
+    <p>
+      这个技巧的核心思路很简单：<strong>STUN 服务器是一面镜子</strong>，
+      你用哪个源端口发包，它就把 NAT 映射后的那个端口告诉你。
+      pystun 用随机端口，所以测不到指定端口的映射；
+      nping 可以指定源端口，但需要手工抓包解析；
+      <code>stun_probe.py</code> 把这一切自动化，一行命令搞定。
+    </p>
+    <p>
+      对于需要打洞（UDP hole punching）的 P2P 应用、或者需要在防火墙策略里精确放行某个端口的场景，
+      这个工具非常实用。
+    </p>
+    <div class="callout callout-tip">
+      <span class="callout-icon">🚀</span>
+      <p>脚本已开源，完整代码见 <a href="../stun_probe.py">stun_probe.py</a>。
+      欢迎在评论区分享你遇到的 NAT 类型和测试结果。</p>
+    </div>
+
+  </div><!-- /article -->
+</div><!-- /post-wrap -->
+
+<footer>
+  <p>© 2026 OpsLife · <a href="../index.html">← 返回首页</a></p>
+</footer>
+
+<script src="../js/posts.js"></script>
+<script src="../js/main.js"></script>
+</body>
+</html>

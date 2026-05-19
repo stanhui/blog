@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpsLife · 运维老兵的技术笔记</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a href="index.html" class="logo">Ops<span>Life</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">首页</a></li>
+    <li><a href="about.html">关于我</a></li>
+    <li><a href="https://github.com" target="_blank">GitHub</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:0.75rem">
+    <button class="theme-toggle" aria-label="切换主题"></button>
+    <button class="menu-toggle" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">15年运维老兵 · 持续输出中</div>
+    <h1>
+      记录技术，<br>
+      <span class="gradient">分享经验</span>
+    </h1>
+    <p class="hero-sub">从机房值班到云原生架构，用文字沉淀15年运维生涯的技术积累与人生感悟</p>
+    <div class="hero-type-wrap">
+      <span id="hero-type" data-text="Linux · Kubernetes · Prometheus · Terraform · CI/CD"></span>
+    </div>
+    <div class="hero-btns">
+      <a href="#posts" class="btn btn-primary">浏览文章</a>
+      <a href="about.html" class="btn btn-outline">了解我</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">15+</div>
+        <div class="stat-label">年从业经验</div>
+      </div>
+      <div>
+        <div class="stat-num">50+</div>
+        <div class="stat-label">技术文章</div>
+      </div>
+      <div>
+        <div class="stat-num">∞</div>
+        <div class="stat-label">持续学习</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Posts -->
+<section class="section" id="posts">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">// 技术文章</div>
+      <h2 class="section-title">最新内容</h2>
+    </div>
+
+    <div class="filter-bar reveal">
+      <button class="filter-btn active" data-cat="all">全部</button>
+      <button class="filter-btn" data-cat="容器运维">容器运维</button>
+      <button class="filter-btn" data-cat="监控告警">监控告警</button>
+      <button class="filter-btn" data-cat="系统优化">系统优化</button>
+      <button class="filter-btn" data-cat="IaC">IaC</button>
+      <button class="filter-btn" data-cat="职业成长">职业成长</button>
+    </div>
+
+    <div class="posts-grid" id="posts-grid"></div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 OpsLife · 用代码丈量世界 · Built with ❤️ &amp; ☕</p>
+</footer>
+
+<script src="js/posts.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
