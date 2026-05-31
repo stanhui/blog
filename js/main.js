@@ -1,6 +1,6 @@
 // ── Theme ────────────────────────────────────────────────────────
 function initTheme() {
-  const saved = localStorage.getItem('theme') || 'dark';
+  const saved = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
   document.querySelectorAll('.theme-toggle').forEach(btn => {
     btn.textContent = saved === 'dark' ? '☀️' : '🌙';
@@ -57,7 +57,7 @@ class ParticleCanvas {
 
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0,212,255,0.6)';
+      ctx.fillStyle = 'rgba(201,100,66,0.5)';
       ctx.fill();
     });
 
@@ -71,7 +71,7 @@ class ParticleCanvas {
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(0,212,255,${0.15 * (1 - dist / 100)})`;
+          ctx.strokeStyle = `rgba(201,100,66,${0.12 * (1 - dist / 100)})`;
           ctx.lineWidth = 0.5;
           ctx.stroke();
         }
@@ -84,7 +84,7 @@ class ParticleCanvas {
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(mouse.x, mouse.y);
-          ctx.strokeStyle = `rgba(99,102,241,${0.3 * (1 - dist / 150)})`;
+          ctx.strokeStyle = `rgba(139,94,60,${0.25 * (1 - dist / 150)})`;
           ctx.lineWidth = 0.8;
           ctx.stroke();
         }

@@ -12,7 +12,7 @@
     .post-cover {
       width: 100%; height: 420px; object-fit: cover; border-radius: 16px;
       margin-bottom: 2.5rem;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
     }
     .post-header { margin-bottom: 2.5rem; }
     .post-header .card-category { position: static; display: inline-block; margin-bottom: 1rem; }
@@ -20,13 +20,13 @@
     .post-header .meta { display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap; }
     .divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
     /* Article typography */
-    .article h2 { font-size: 1.35rem; font-weight: 700; color: var(--cyan); margin: 2.5rem 0 1rem; padding-left: 0.75rem; border-left: 3px solid var(--cyan); }
-    .article h3 { font-size: 1.05rem; font-weight: 600; color: var(--purple); margin: 1.8rem 0 0.6rem; }
+    .article h2 { font-size: 1.35rem; font-weight: 700; color: var(--accent); margin: 2.5rem 0 1rem; padding-left: 0.75rem; border-left: 3px solid var(--accent); }
+    .article h3 { font-size: 1.05rem; font-weight: 600; color: var(--warm); margin: 1.8rem 0 0.6rem; }
     .article p { color: var(--text-muted); line-height: 1.85; margin-bottom: 1.1rem; }
     .article ul, .article ol { padding-left: 1.5rem; margin-bottom: 1.1rem; }
     .article li { color: var(--text-muted); line-height: 1.8; margin-bottom: 0.3rem; }
     .article strong { color: var(--text); }
-    .article a { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }
+    .article a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
     /* Code blocks */
     .article pre {
       background: var(--surface); border: 1px solid var(--border);
@@ -46,18 +46,18 @@
     /* Inline code */
     .article code:not(pre code) {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem; background: color-mix(in srgb, var(--cyan) 10%, transparent);
-      border: 1px solid color-mix(in srgb, var(--cyan) 20%, transparent);
-      padding: 0.1em 0.45em; border-radius: 4px; color: var(--cyan);
+      font-size: 0.82rem; background: color-mix(in srgb, var(--accent) 8%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+      padding: 0.1em 0.45em; border-radius: 4px; color: var(--accent);
     }
     /* Callout boxes */
     .callout {
       border-radius: 10px; padding: 1rem 1.25rem;
       margin: 1.5rem 0; display: flex; gap: 0.75rem; align-items: flex-start;
     }
-    .callout-info  { background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); }
+    .callout-info  { background: color-mix(in srgb, var(--accent) 5%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
     .callout-warn  { background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.2); }
-    .callout-tip   { background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.25); }
+    .callout-tip   { background: color-mix(in srgb, var(--warm) 6%, transparent); border: 1px solid color-mix(in srgb, var(--warm) 20%, transparent); }
     .callout-icon  { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
     .callout p     { margin: 0; font-size: 0.9rem; }
     /* Packet diagram */
@@ -67,7 +67,7 @@
       font-size: 0.8rem; margin: 1.2rem 0 1.5rem;
     }
     .pkt-table th {
-      background: var(--surface2); color: var(--cyan);
+      background: var(--surface2); color: var(--accent);
       padding: 0.5rem 0.75rem; text-align: left;
       border: 1px solid var(--border);
     }
@@ -76,16 +76,16 @@
       color: var(--text-muted);
     }
     .pkt-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
-    .hl { color: #fbbf24; font-weight: 600; }
-    .hl-green { color: #34d399; font-weight: 600; }
-    .hl-pink  { color: #f472b6; font-weight: 600; }
+    .hl { color: var(--accent); font-weight: 600; }
+    .hl-green { color: #8b5e3c; font-weight: 600; }
+    .hl-pink  { color: #c96442; font-weight: 600; }
     /* Back link */
     .back-link {
       display: inline-flex; align-items: center; gap: 0.4rem;
       color: var(--text-muted); font-size: 0.88rem;
       margin-bottom: 2rem; transition: color 0.2s;
     }
-    .back-link:hover { color: var(--cyan); }
+    .back-link:hover { color: var(--accent); }
   </style>
 </head>
 <body>
