@@ -139,19 +139,20 @@ function renderPosts(list, container) {
   if (!container) return;
   container.innerHTML = list.map((p, i) => {
     const href = p.url || `post.html?id=${p.id}`;
+    const isFeature = list.length <= 2;
     return `
-    <article class="post-card reveal" style="--delay:${i * 0.08}s">
+    <article class="post-card${isFeature ? ' post-card--feature' : ''} reveal" style="--delay:${i * 0.08}s">
       <a href="${href}" class="card-img-wrap">
         <img src="${p.cover}" alt="${p.title}" loading="lazy">
         <span class="card-category">${p.category}</span>
       </a>
       <div class="card-body">
-        <div class="card-meta">
-          <span class="date">${p.date}</span>
-          <span class="read-time">⏱ ${p.readTime} min</span>
-        </div>
         <h3><a href="${href}">${p.title}</a></h3>
         <p>${p.summary}</p>
+        <div class="card-meta">
+          <span class="date">📅 ${p.date}</span>
+          <span class="read-time">⏱ ${p.readTime} min</span>
+        </div>
         <div class="card-tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
       </div>
     </article>

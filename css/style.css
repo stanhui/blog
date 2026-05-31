@@ -227,6 +227,16 @@ img { max-width: 100%; display: block; }
   border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
   color: var(--warm);
 }
+/* Feature card: horizontal layout when few posts */
+.post-card--feature { display: grid; grid-template-columns: 280px 1fr; }
+.post-card--feature .card-img-wrap { height: 100%; min-height: 240px; }
+.post-card--feature .card-body { display: flex; flex-direction: column; justify-content: center; padding: 2rem; }
+.post-card--feature .card-body h3 { font-size: 1.25rem; }
+.post-card--feature .card-body p { font-size: 0.92rem; }
+@media (max-width: 768px) {
+  .post-card--feature { grid-template-columns: 1fr; }
+  .post-card--feature .card-img-wrap { height: 200px; min-height: auto; }
+}
 
 /* ── Scroll Reveal ─────────────────────────────────────────────── */
 .reveal {
